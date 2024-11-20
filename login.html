@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Login</title>
+  <title>Login</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -52,7 +52,6 @@
     <button onclick="login()">Login</button>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcrypt.js/2.4.3/bcrypt.min.js"></script>
   <script>
     const API_URL = "https://673df0b20118dbfe860975cc.mockapi.io/api/v1/users";
 
@@ -78,10 +77,8 @@
           return;
         }
 
-        // Compare the input password with the stored hashed password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (isPasswordValid) {
+        // Check if the entered password matches the stored one
+        if (user.password === password) {
           alert("Login successful!");
           // Redirect to chat or dashboard
           window.location.href = "chat.html";
