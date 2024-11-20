@@ -42,13 +42,21 @@
     .register-box button:hover {
       background: #0056b3;
     }
+    .error-message {
+      color: red;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
   <div class="register-box">
     <h2>Register</h2>
     <input type="text" id="username" placeholder="Enter username" />
+    <div id="username-error" class="error-message"></div>
     <input type="password" id="password" placeholder="Enter password" />
+    <div id="password-error" class="error-message"></div>
+    <input type="password" id="confirm-password" placeholder="Confirm password" />
+    <div id="confirm-password-error" class="error-message"></div>
     <button onclick="register()">Register</button>
   </div>
 
@@ -58,14 +66,54 @@
     async function register() {
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+      
+      // Clear previous error messages
+      document.getElementById("username-error").textContent = "";
+      document.getElementById("password-error").textContent = "";
+      document.getElementById("confirm-password-error").textContent = "";
 
-      if (!username || !password) {
-        alert("Please fill in both fields!");
+      // Check for valid username
+      if (username.length < 3 || username.length > 20) {
+        document.getElementById("username-error").textContent = "Username must be between 3 and 20 characters.";
         return;
       }
 
+      const usernameRegex = /^[a-zA-Z_]+$/;
+      const underscoreCount = (username.match(/_/g) || []).length;
+      if (!usernameRegex.test(username) || underscoreCount > 1) {
+        document.getElementById("username-error").textContent = "Username can only contain letters and one underscore.";
+        return;
+      }
+
+      // Check if the username is already taken
+      const response = await fetch(API_URL);
+      const users = await response.json();
+      const usernameTaken = users.some((user) => user.username === username);
+      if (usernameTaken) {
+        document.getElementById("username-error").textContent = "Username is already taken. Please choose another one.";
+        return;
+      }
+
+      // Check for valid password
+      if (password.length < 8) {
+        document.getElementById("password-error").textContent = "Password must be at least 8 characters.";
+        return;
+      }
+
+      if (password === "12345678" || password === "123456789") {
+        document.getElementById("password-error").textContent = "Password is too weak.";
+        return;
+      }
+
+      // Check if passwords match
+      if (password !== confirmPassword) {
+        document.getElementById("confirm-password-error").textContent = "Passwords do not match.";
+        return;
+      }
+
+      // Proceed to register the user
       try {
-        // Directly store the password (not hashed)
         const response = await fetch(API_URL, {
           method: "POST",
           headers: {
@@ -76,7 +124,6 @@
 
         if (response.ok) {
           alert("Registration successful!");
-          // Redirect to login page
           window.location.href = "login.html";
         } else {
           alert("Failed to register. Please try again.");
