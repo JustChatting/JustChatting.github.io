@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Registration</title>
+  <title>Registration</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -52,9 +52,6 @@
     <button onclick="register()">Register</button>
   </div>
 
-  <!-- Load bcrypt.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcrypt.js/2.4.3/bcrypt.min.js"></script>
-  
   <script>
     const API_URL = "https://673df0b20118dbfe860975cc.mockapi.io/api/v1/users";
 
@@ -68,21 +65,18 @@
       }
 
       try {
-        // Hash the password using bcrypt
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Save user data with hashed password to MockAPI
+        // Directly store the password (not hashed)
         const response = await fetch(API_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, password: hashedPassword }),
+          body: JSON.stringify({ username, password }),
         });
 
         if (response.ok) {
           alert("Registration successful!");
-          // Redirect to login or chat page
+          // Redirect to login page
           window.location.href = "login.html";
         } else {
           alert("Failed to register. Please try again.");
